@@ -1,10 +1,10 @@
 Name:		sigar
 Version:	1.6.5
-Release:	0.2.git833ca18%{?dist}
+Release:	0.3.git58097d9%{?dist}
 Summary:	System Information Gatherer And Reporter
 
 %global sigar_suffix  0-g4b67f57
-%global sigar_hash    833ca18
+%global sigar_hash    58097d9
 
 Group:		System Environment/Libraries
 License:	ASL 2.0
