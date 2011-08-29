@@ -1,6 +1,6 @@
 Name:		sigar
 Version:	1.6.5
-Release:	0.3.git58097d9%{?dist}
+Release:	0.4.git58097d9%{?dist}
 Summary:	System Information Gatherer And Reporter
 
 %global sigar_suffix  0-g4b67f57
@@ -24,6 +24,8 @@ Source0:	%{name}-%{version}-%{sigar_hash}.tbz2
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	gcc cmake
+
+Patch100: bz714249-1-cpu-count.patch
 
 %description
 The Sigar API provides a portable interface for gathering system
@@ -55,6 +57,8 @@ Header files for developing against the Sigar API
 # When using the GitHub tarballs, use:
 # setup -q -n hyperic-{name}-{sigar_hash}
 %setup -q -n %{name}-%{version}
+
+%patch100 -p1 -b .bz714249
 
 %build
 
@@ -92,6 +96,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc LICENSE NOTICE AUTHORS
 
 %changelog
+* Mon Aug 29 2011 Zane Bitter <zbitter@redhat.com> - 1.6.5-0.4.git833ca18
+- Get CPU counts from /proc/cpuinfo
+  Resolves: #714249
+
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.6.5-0.2.git833ca18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
