@@ -1,6 +1,6 @@
 Name:		sigar
 Version:	1.6.5
-Release:	0.4.git58097d9%{?dist}
+Release:	0.5.git58097d9%{?dist}
 Summary:	System Information Gatherer And Reporter
 
 %global sigar_suffix  0-g4b67f57
@@ -26,6 +26,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	gcc cmake
 
 Patch100: bz714249-1-cpu-count.patch
+Patch101: bz746288-1-cpu-count-arch.patch
 
 %description
 The Sigar API provides a portable interface for gathering system
@@ -59,6 +60,7 @@ Header files for developing against the Sigar API
 %setup -q -n %{name}-%{version}
 
 %patch100 -p1 -b .bz714249
+%patch101 -p1 -b .bz746288
 
 %build
 
@@ -96,6 +98,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc LICENSE NOTICE AUTHORS
 
 %changelog
+* Fri Oct 21 2011 Zane Bitter <zbitter@redhat.com> - 1.6.4-0.5.git833ca18
+- Get correct CPU counts on non-x86 architectures
+
 * Mon Aug 29 2011 Zane Bitter <zbitter@redhat.com> - 1.6.5-0.4.git833ca18
 - Get CPU counts from /proc/cpuinfo
   Resolves: #714249
