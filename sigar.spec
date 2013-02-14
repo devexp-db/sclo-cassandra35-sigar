@@ -1,6 +1,6 @@
 Name:		sigar
 Version:	1.6.5
-Release:	0.7.git58097d9%{?dist}
+Release:	0.8.git58097d9%{?dist}
 Summary:	System Information Gatherer And Reporter
 
 %global sigar_suffix  0-g4b67f57
@@ -98,6 +98,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc LICENSE NOTICE AUTHORS
 
 %changelog
+* Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.6.5-0.8.git58097d9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
 * Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.6.5-0.7.git58097d9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
