@@ -1,0 +1,354 @@
+diff -Nru sigar-1.6.5/bindings/java/build.xml sigar-1.6.5-gil/bindings/java/build.xml
+--- sigar-1.6.5/bindings/java/build.xml	2011-04-21 20:38:36.000000000 +0200
++++ sigar-1.6.5-gil/bindings/java/build.xml	2012-12-05 09:11:27.360092658 +0100
+@@ -22,7 +22,7 @@
+   <property name="jni.info.res" location="build/src/sigar.res"/>
+   <property name="jni.libprefix" value=""/> <!-- drop "java" prefix -->
+   <property name="cpptasks.jar"
+-            location="hyperic_jni/lib/cpptasks.jar"/>
++	    location="/usr/share/java/ant/cpptasks.jar"/>
+ 
+   <condition property="file.version" value="-${sigar.version}">
+     <isset property="file.versioned"/>
+@@ -50,13 +50,15 @@
+   <property name="sigar.fqdn" value=""/>
+ 
+   <path id="libjars">
+-     <fileset dir="lib" includes="*.jar"/>
++     <fileset dir="/usr/share/java" includes="ant/cpptasks.jar"/>
++     <fileset dir="/usr/share/java" includes="mx4j/mx4j-jmx.jar"/>
++     <fileset dir="/usr/share/java" includes="log4j.jar"/>
+   </path>
+ 
+   <path id="alljars">
+      <path refid="libjars"/>
+      <fileset dir="${sigar-bin}/lib" includes="${sigar.jar}"/>
+-     <fileset dir="${ant.library.dir}" includes="junit*.jar"/>
++     <fileset dir="/usr/share/java" includes="junit.jar"/>
+   </path>
+ 
+   <target name="javadoc_check">
+@@ -85,7 +87,7 @@
+              doctitle="Sigar">
+       <group title="Sigar" packages="org.hyperic.sigar" />
+       <classpath refid="libjars"/>
+-      <classpath><path path="${ant.library.dir}/ant.jar"/></classpath>
++      <classpath><path path="/usr/share/java/ant.jar"/></classpath>
+      <bottom>Copyright &#169; ${copyright.year} <![CDATA[<a target="_top" href="http://www.hyperic.com/">Hyperic</a>]]>. All Rights Reserved.</bottom>
+     </javadoc>
+   </target>
+@@ -96,7 +98,7 @@
+       <classpath refid="alljars"/>
+     </available>
+     <javac destdir="${build}/classes"
+-           source="1.4" target="1.4"
++           source="1.5" target="1.5"
+            sourcepath=""
+            debug="true"
+            classpathref="libjars">
+diff -Nru sigar-1.6.5/bindings/java/hyperic_jni/jni-build.xml sigar-1.6.5-gil/bindings/java/hyperic_jni/jni-build.xml
+--- sigar-1.6.5/bindings/java/hyperic_jni/jni-build.xml	2011-04-21 20:38:36.000000000 +0200
++++ sigar-1.6.5-gil/bindings/java/hyperic_jni/jni-build.xml	2012-12-05 09:15:11.564529239 +0100
+@@ -28,7 +28,7 @@
+   <property name="jni.libprefix" value="java"/>
+   <property name="jni.libversion" value=""/>
+ 
+-  <property name="cpptasks.jar" location="lib/cpptasks.jar"/>
++  <property name="cpptasks.jar" location="/usr/share/java/cpptasks.jar"/>
+ 
+   <taskdef name="cc" classname="net.sf.antcontrib.cpptasks.CCTask">
+     <classpath location="${cpptasks.jar}"/>
+@@ -60,7 +60,7 @@
+     <condition property="linux">
+       <equals arg1="${os.name}" arg2="Linux"/>
+     </condition>
+-    <condition property="solaris">
++    <!--condition property="solaris">
+       <equals arg1="${os.name}" arg2="SunOS"/>
+     </condition>
+     <condition property="win32">
+@@ -86,13 +86,13 @@
+     </condition>
+     <condition property="osf1">
+       <equals arg1="${os.name}" arg2="OSF1"/>
+-    </condition>
++    </condition-->
+ 
+     <condition property="jni.os" value="linux">
+       <isset property="linux"/>
+     </condition>
+ 
+-    <condition property="jni.os" value="win32">
++    <!--condition property="jni.os" value="win32">
+       <isset property="win32"/>
+     </condition>
+ 
+@@ -122,10 +122,10 @@
+ 
+     <condition property="jni.os" value="netbsd">
+       <isset property="netbsd"/>
+-    </condition>
++    </condition-->
+ 
+     <!-- darwin and freebsd use the same source files -->
+-    <condition property="jni.src" value="darwin">
++    <!--condition property="jni.src" value="darwin">
+       <isset property="freebsd"/>
+     </condition>
+     <condition property="jni.src" value="darwin">
+@@ -137,7 +137,7 @@
+ 
+     <condition property="jni.os" value="osf1">
+       <isset property="osf1"/>
+-    </condition>
++    </condition-->
+ 
+     <condition property="jni.jdk.os" value="${jni.os}">
+       <and>
+@@ -146,13 +146,13 @@
+       </and>
+     </condition>
+ 
+-    <condition property="jni.jdk.os" value="hp-ux">
++    <!--condition property="jni.jdk.os" value="hp-ux">
+       <istrue value="${hpux}"/>
+     </condition>
+ 
+     <condition property="jni.jdk.os" value="alpha">
+       <istrue value="${osf1}"/>
+-    </condition>
++    </condition-->
+ 
+     <condition property="jni.src" value="${jni.os}">
+       <isfalse value="${jni.src}"/>
+@@ -161,7 +161,7 @@
+     <echo message="jni.src=${jni.src}, jni.jdk.os=${jni.jdk.os}, ${sun.arch.data.model}-bit"/>
+ 
+     <javac srcdir="${jni.src.java}" destdir="${build}/classes" debug="true"
+-           source="1.4" target="1.4"
++           source="1.5" target="1.5"
+ 	   includes="org/hyperic/jni/*.java"/>
+ 
+     <taskdef name="libarch" classname="org.hyperic.jni.ArchNameTask">
+@@ -190,9 +190,9 @@
+ 
+     <property name="jni.objdir" value="${build}/obj/${jni.libarch}"/>
+ 
+-    <condition property="jni.cc" value="uni-cc">
++    <!--condition property="jni.cc" value="uni-cc">
+       <isset property="darwin"/>
+-    </condition>
++    </condition-->
+ 
+     <property name="jni.cc" value="jni-cc"/>
+ 
+@@ -225,19 +225,19 @@
+   </target>
+ 
+   <!-- run jni-cc twice {ppc,i386}, then feed both to lipo to build a universal binary -->
+-  <target name="uni-cc" if="jni.libarch">
+-    <property name="shlib" value="${jni.objdir}/lib/lib${jni.libname}.dylib"/>
++  <!--target name="uni-cc" if="jni.libarch">
++    <property name="shlib" value="${jni.objdir}/lib/lib${jni.libname}.dylib"/-->
+ 
+     <!-- ppc -->
+-    <echo message="build 'ppc' arch"/>
++    <!--echo message="build 'ppc' arch"/>
+     <antcall target="jni-cc" inheritRefs="true">
+       <param name="uni.arch" value="ppc"/>
+     </antcall>
+ 
+-    <copy file="${shlib}" tofile="${shlib}.ppc"/>
++    <copy file="${shlib}" tofile="${shlib}.ppc"/-->
+ 
+     <!-- i386 -->
+-    <echo message="build 'i386' arch"/>
++    <!--echo message="build 'i386' arch"/>
+     <delete>
+       <fileset dir="${jni.objdir}" includes="*.o"/>
+     </delete>
+@@ -256,7 +256,7 @@
+     <delete>
+       <fileset dir="${jni.objdir}/lib" includes="*.ppc,*.i386"/>
+     </delete>
+-  </target>
++  </target-->
+ 
+   <target name="jni-cc" if="jni.libarch">
+     <mkdir dir="${jni.objdir}/lib"/>
+@@ -270,7 +270,7 @@
+ 	relentless="false">
+ 
+       <!-- HPUX -->
+-      <compiler name="hp"  if="hpux">
++      <!--compiler name="hp"  if="hpux">
+         <compilerarg value="+Z"/>
+         <compilerarg value="+DD64" if="jni.arch64"/>
+ 
+@@ -288,10 +288,10 @@
+ 
+         <syslibset libs="nsl"/>
+         <syslibset libs="nm"/>
+-      </linker>
++      </linker-->
+ 
+       <!-- Solaris -->
+-      <compiler name="gcc" if="solaris">
++      <!--compiler name="gcc" if="solaris">
+         <compilerarg value="-O2" if="jni.optim"/>
+         <compilerarg value="-g" if="jni.debug"/>
+         <compilerarg value="-Wall"/>
+@@ -303,12 +303,12 @@
+           <define name="_POSIX_PTHREAD_SEMANTICS"/>
+           <define name="DMALLOC" if="jni.dmalloc"/>
+         </defineset>
+-      </compiler>
++      </compiler-->
+ 
+-      <linker name="gcc" if="solaris">
++      <!--linker name="gcc" if="solaris"-->
+         <!-- required for modern gcc to avoid libgcc_s.so dependency -->
+         <!-- this arg is ignored by older gcc -->
+-        <linkerarg value="-static-libgcc"/>
++        <!--linkerarg value="-static-libgcc"/>
+         <linkerarg value="-m64" if="jni.arch64"/>
+ 
+         <libset if="jni.libset.libs"
+@@ -317,7 +317,7 @@
+         <libset if="jni.dmalloc"
+                 dir="${jni.dmalloc}/lib"
+                 libs="dmallocth"/>
+-      </linker>
++      </linker-->
+ 
+       <!-- Linux -->
+       <compiler name="gcc" debug="${jni.debug}" if="linux">
+@@ -344,7 +344,7 @@
+       </linker>
+ 
+       <!-- Darwin -->
+-      <compiler name="gcc" if="darwin">
++      <!--compiler name="gcc" if="darwin">
+         <compilerarg value="-Wall"/>
+         <compilerarg value="-Werror" if="jni.werror"/>
+         <compilerarg value="-m64" if="jni.arch64"/>
+@@ -369,10 +369,10 @@
+         <linkerarg value="-Wl,-syslibroot,${uni.sdk}"/>
+         <linkerarg value="-arch"/>
+         <linkerarg value="${uni.arch}"/>
+-        <linkerarg value="-mmacosx-version-min=${osx.min}"/>
++        <linkerarg value="-mmacosx-version-min=${osx.min}"/-->
+ 
+         <!-- for Gestalt() -->
+-        <linkerarg value="-framework"/>
++        <!--linkerarg value="-framework"/>
+         <linkerarg value="CoreServices"/>
+ 
+         <linkerarg value="-sectcreate,__TEXT,__info_plist,${jni.info.plist}" if="jni.info.plist"/>
+@@ -382,10 +382,10 @@
+                 libs="${jni.libset.libs}"/>
+ 
+         <syslibset libs="IOKit"/>
+-      </linker>
++      </linker-->
+ 
+       <!-- Freebsd -->
+-      <compiler name="gcc" if="freebsd">
++      <!--compiler name="gcc" if="freebsd">
+         <compilerarg value="-O2" if="jni.optim"/>
+         <compilerarg value="-g" if="jni.debug"/>
+         <compilerarg value="-Wall"/>
+@@ -400,15 +400,15 @@
+                 dir="${jni.libset.dir}"
+                 libs="${jni.libset.libs}"/>
+         <syslibset libs="kvm"/>
+-      </linker>
++      </linker-->
+ 
+       <!-- OpenBSD -->
+-      <compiler name="gcc" if="openbsd">
++      <!--compiler name="gcc" if="openbsd">
+         <compilerarg value="-O2" if="jni.optim"/>
+         <compilerarg value="-g" if="jni.debug"/>
+-        <compilerarg value="-Wall"/>
++        <compilerarg value="-Wall"/-->
+         <!-- <compilerarg value="-Werror" if="jni.werror"/> -->
+-        <defineset>
++        <!--defineset>
+           <define name="${jni.define.name}_OPENBSD"/>
+         </defineset>
+       </compiler>
+@@ -418,15 +418,15 @@
+                 dir="${jni.libset.dir}"
+                 libs="${jni.libset.libs}"/>
+         <syslibset libs="kvm"/>
+-      </linker>
++      </linker-->
+ 
+       <!-- NetBSD -->
+-      <compiler name="gcc" if="netbsd">
++      <!--compiler name="gcc" if="netbsd">
+         <compilerarg value="-O2" if="jni.optim"/>
+         <compilerarg value="-g" if="jni.debug"/>
+-        <compilerarg value="-Wall"/>
++        <compilerarg value="-Wall"/-->
+         <!-- <compilerarg value="-Werror" if="jni.werror"/> -->
+-        <defineset>
++        <!--defineset>
+           <define name="${jni.define.name}_NETBSD"/>
+         </defineset>
+       </compiler>
+@@ -436,10 +436,10 @@
+                 dir="${jni.libset.dir}"
+                 libs="${jni.libset.libs}"/>
+         <syslibset libs="kvm"/>
+-      </linker>
++      </linker-->
+ 
+       <!-- AIX -->
+-      <compiler name="xlc_r" if="aix">
++      <!--compiler name="xlc_r" if="aix">
+         <compilerarg value="-q64" if="jni.arch64"/>
+         <defineset>
+           <define name="${jni.define.name}_AIX"/>
+@@ -454,10 +454,10 @@
+         <libset if="jni.libset.libs"
+                 dir="${jni.libset.dir}"
+                 libs="${jni.libset.libs}"/>
+-      </linker>
++      </linker-->
+ 
+       <!-- WIN32 -->
+-      <linker name="msvc" debug="${jni.debug}" if="win32">
++      <!--linker name="msvc" debug="${jni.debug}" if="win32">
+         <libset if="jni.libset.libs"
+                 dir="${jni.libset.dir}"
+                 libs="${jni.libset.libs}"/>
+@@ -470,14 +470,14 @@
+       <compiler name="msvc" debug="${jni.debug}" if="win32">
+         <defineset>
+           <define name="WIN32"/>
+-          <define name="_CRT_SECURE_NO_DEPRECATE"/>
++          <define name="_CRT_SECURE_NO_DEPRECATE"/-->
+           <!-- XXX 2008 MSC express/SDK does not include atl headers -->
+-          <define name="SIGAR_NO_ATL" if="jni.noatl"/>
++          <!--define name="SIGAR_NO_ATL" if="jni.noatl"/>
+         </defineset>
+-      </compiler>
++      </compiler-->
+ 
+       <!-- OSF1 -->
+-      <compiler name="gcc" if="osf1">
++      <!--compiler name="gcc" if="osf1">
+         <compilerarg value="-Wall"/>
+         <compilerarg value="-pthread"/>
+         <defineset>
+@@ -491,7 +491,7 @@
+                 libs="${jni.libset.libs}"/>
+ 
+         <syslibset libs="mach"/>
+-      </linker>
++      </linker-->
+ 
+       <!-- C sources -->
+       <fileset dir="${jni.source.dir}">

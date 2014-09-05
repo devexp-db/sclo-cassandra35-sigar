@@ -1,6 +1,6 @@
 Name:		sigar
 Version:	1.6.5
-Release:	0.11.git58097d9%{?dist}
+Release:	0.12.git58097d9%{?dist}
 Summary:	System Information Gatherer And Reporter
 
 %global sigar_suffix  0-g4b67f57
@@ -21,12 +21,26 @@ URL:		http://sigar.hyperic.com/
 # The diff from 1.6.4 is too huge to contemplate cherrypicking from
 Source0:	%{name}-%{version}-%{sigar_hash}.tbz2
 
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+# originally taken from http://repo1.maven.org/maven2/org/fusesource/sigar/1.6.4/sigar-1.6.4.pom
+Source1:	%{name}-template-pom.xml
 
 BuildRequires:	gcc cmake
 
+BuildRequires:  cpptasks
+BuildRequires:  javapackages-local
+BuildRequires:  ant
+%if %{?fedora} > 20
+BuildRequires:  log4j12
+%else
+BuildRequires:  log4j
+%endif
+BuildRequires:  mx4j
+
 Patch100: bz714249-1-cpu-count.patch
 Patch101: bz746288-1-cpu-count-arch.patch
+# use system libraries
+# build only linux jni libraries
+Patch120: %{name}-%{version}-java_build.patch
 
 %description
 The Sigar API provides a portable interface for gathering system
@@ -54,6 +68,18 @@ Requires:	%{name} = %{version}-%{release}
 %description devel
 Header files for developing against the Sigar API
 
+%package java
+Summary:        SIGAR Java bindings
+
+%description java
+This package contains the Java bindings SIGAR.
+
+%package javadoc
+Summary:       Javadoc for SIGAR Java bindings
+
+%description javadoc
+This package contains javadoc for SIGAR Java bindings.
+
 %prep
 # When using the GitHub tarballs, use:
 # setup -q -n hyperic-{name}-{sigar_hash}
@@ -61,6 +87,16 @@ Header files for developing against the Sigar API
 
 %patch100 -p1 -b .bz714249
 %patch101 -p1 -b .bz746288
+
+%patch120 -p1 -b .bz872103
+# clean up
+find . -name "*.class" -delete
+find . -name "*.jar" -delete
+cp -p %{SOURCE1} bindings/java/pom.xml
+sed -i "s|@VERSION@|%{version}|" bindings/java/pom.xml
+%if %{?fedora} > 20
+sed -i.log4j12 "s|log4j.jar|log4j12-1.2.17.jar|" bindings/java/build.xml
+%endif
 
 %build
 
@@ -73,15 +109,25 @@ pushd build
 make %{?_smp_mflags}
 popd
 
+pushd bindings/java
+%mvn_file org.fusesource:%{name} %{name}
+%ant build javadoc
+%mvn_artifact pom.xml %{name}-bin/lib/%{name}.jar
+popd
+
 %install
-rm -rf $RPM_BUILD_ROOT
+
 pushd build
 %cmake ..
 make install DESTDIR=$RPM_BUILD_ROOT
 popd
 
-%clean
-rm -rf $RPM_BUILD_ROOT
+pushd  bindings/java
+%mvn_install -J build/javadoc
+mkdir -p %{buildroot}%{_libdir}/%{name}
+install -pm 755 %{name}-bin/lib/libsigar-*.so \
+  %{buildroot}%{_libdir}/%{name}/
+popd
 
 %post -p /sbin/ldconfig
 
@@ -97,7 +143,18 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/sigar*.h
 %doc LICENSE NOTICE AUTHORS
 
+%files java -f bindings/java/.mfiles
+%{_libdir}/%{name}
+%doc LICENSE NOTICE bindings/java/examples
+
+%files javadoc -f bindings/java/.mfiles-javadoc
+%doc LICENSE NOTICE
+
 %changelog
+* Fri Sep 05 2014 gil cattaneo <puntogil@libero.it> 1.6.5-0.12.git58097d9
+- Added java bindings sub packages (rhbz#872103)
+- Minor changes to current guideline
+
 * Mon Aug 18 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.6.5-0.11.git58097d9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
