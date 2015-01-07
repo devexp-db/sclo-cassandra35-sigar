@@ -6,7 +6,9 @@ Summary:	System Information Gatherer And Reporter
 %global sigar_suffix  0-g4b67f57
 %global sigar_hash    58097d9
 
-Group:		System Environment/Libraries
+# Use the same directory of the main package for subpackage licence and docs
+%global _docdir_fmt %{name}
+
 License:	ASL 2.0
 URL:		http://sigar.hyperic.com/
 
@@ -64,6 +66,7 @@ License:	ASL 2.0
 Group:		Development/Libraries
 Summary:	SIGAR Development package - System Information Gatherer And Reporter
 Requires:	%{name} = %{version}-%{release}
+BuildArch:      noarch
 
 %description devel
 Header files for developing against the Sigar API
@@ -75,7 +78,8 @@ Summary:        SIGAR Java bindings
 This package contains the Java bindings SIGAR.
 
 %package javadoc
-Summary:       Javadoc for SIGAR Java bindings
+Summary:        Javadoc for SIGAR Java bindings
+BuildArch:      noarch
 
 %description javadoc
 This package contains javadoc for SIGAR Java bindings.
@@ -85,10 +89,10 @@ This package contains javadoc for SIGAR Java bindings.
 # setup -q -n hyperic-{name}-{sigar_hash}
 %setup -q -n %{name}-%{version}
 
-%patch100 -p1 -b .bz714249
-%patch101 -p1 -b .bz746288
+%patch100 -p1
+%patch101 -p1
 
-%patch120 -p1 -b .bz872103
+%patch120 -p1
 # clean up
 find . -name "*.class" -delete
 find . -name "*.jar" -delete
@@ -101,7 +105,7 @@ sed -i.log4j12 "s|log4j.jar|log4j12-1.2.17.jar|" bindings/java/build.xml
 %build
 
 # Fix lib directory
-sed -i.sed s:DESTINATION\ lib:DESTINATION\ %{_lib}: src/CMakeLists.txt
+sed -i 's|DESTINATION lib|DESTINATION %{_lib}|' src/CMakeLists.txt
 
 mkdir build
 pushd build
@@ -134,26 +138,29 @@ popd
 %postun -p /sbin/ldconfig
 
 %files
-%defattr(-,root,root,-)
-%doc ChangeLog README LICENSE NOTICE AUTHORS
+%license LICENSE
+%doc ChangeLog README NOTICE AUTHORS
 %{_libdir}/libsigar.so
 
 %files devel
-%defattr(-,root,root,-)
 %{_includedir}/sigar*.h
-%doc LICENSE NOTICE AUTHORS
+%license LICENSE
+%doc NOTICE AUTHORS
 
 %files java -f bindings/java/.mfiles
 %{_libdir}/%{name}
-%doc LICENSE NOTICE bindings/java/examples
+%license LICENSE
+%doc NOTICE
 
 %files javadoc -f bindings/java/.mfiles-javadoc
-%doc LICENSE NOTICE
+%license LICENSE
+%doc NOTICE bindings/java/examples
 
 %changelog
 * Fri Sep 05 2014 gil cattaneo <puntogil@libero.it> 1.6.5-0.12.git58097d9
 - Added java bindings sub packages (rhbz#872103)
 - Minor changes to current guideline
+- Make -devel and -docs subpackages noarch
 
 * Mon Aug 18 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.6.5-0.11.git58097d9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
