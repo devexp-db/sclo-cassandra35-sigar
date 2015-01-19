@@ -1,6 +1,6 @@
 Name:		sigar
 Version:	1.6.5
-Release:	0.12.git58097d9%{?dist}
+Release:	0.13.git58097d9%{?dist}
 Summary:	System Information Gatherer And Reporter
 
 %global sigar_suffix  0-g4b67f57
@@ -43,6 +43,9 @@ Patch101: bz746288-1-cpu-count-arch.patch
 # use system libraries
 # build only linux jni libraries
 Patch120: %{name}-%{version}-java_build.patch
+
+# AArch64 is 64-bit only so no -m64
+Patch130: aarch64-no-m64.patch
 
 %description
 The Sigar API provides a portable interface for gathering system
@@ -93,6 +96,7 @@ This package contains javadoc for SIGAR Java bindings.
 %patch101 -p1
 
 %patch120 -p1
+%patch130 -p1
 # clean up
 find . -name "*.class" -delete
 find . -name "*.jar" -delete
@@ -157,6 +161,9 @@ popd
 %doc NOTICE bindings/java/examples
 
 %changelog
+* Mon Jan 19 2015 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 1.6.5-0.13.git58097d9
+- fixed fix to build on aarch64 (#1183634)
+
 * Fri Sep 05 2014 gil cattaneo <puntogil@libero.it> 1.6.5-0.12.git58097d9
 - Added java bindings sub packages (rhbz#872103)
 - Minor changes to current guideline
