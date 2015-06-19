@@ -1,6 +1,6 @@
 Name:		sigar
 Version:	1.6.5
-Release:	0.13.git58097d9%{?dist}
+Release:	0.14.git58097d9%{?dist}
 Summary:	System Information Gatherer And Reporter
 
 %global sigar_suffix  0-g4b67f57
@@ -161,6 +161,9 @@ popd
 %doc NOTICE bindings/java/examples
 
 %changelog
+* Fri Jun 19 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.6.5-0.14.git58097d9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Mon Jan 19 2015 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 1.6.5-0.13.git58097d9
 - fixed fix to build on aarch64 (#1183634)
 
