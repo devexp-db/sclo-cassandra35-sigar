@@ -1,6 +1,6 @@
 Name:		sigar
 Version:	1.6.5
-Release:	0.14.git58097d9%{?dist}
+Release:	0.15.git58097d9%{?dist}
 Summary:	System Information Gatherer And Reporter
 
 %global sigar_suffix  0-g4b67f57
@@ -113,6 +113,10 @@ sed -i 's|DESTINATION lib|DESTINATION %{_lib}|' src/CMakeLists.txt
 
 mkdir build
 pushd build
+# FIXME: Package suffers from c11/inline issues
+# Workaround by appending --std=gnu89 to CFLAGS
+# Proper fix would be to fix the source-code
+CFLAGS="${RPM_OPT_FLAGS} --std=gnu89"
 %cmake ..
 make %{?_smp_mflags}
 popd
@@ -161,6 +165,10 @@ popd
 %doc NOTICE bindings/java/examples
 
 %changelog
+* Mon Jun 22 2015 Ralf Corsépius <corsepiu@fedoraproject.org> - 1.6.5-0.15.git58097d9
+- Append --std=gnu89 to CFLAGS (Work-around to c11/inline compatibility
+  issues. Fix FTBFS).
+
 * Fri Jun 19 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.6.5-0.14.git58097d9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
