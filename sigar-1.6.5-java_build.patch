@@ -1,6 +1,6 @@
-diff -Nru sigar-1.6.5/bindings/java/build.xml sigar-1.6.5-gil/bindings/java/build.xml
+diff -ur sigar-1.6.5/bindings/java/build.xml sigar-1.6.5new/bindings/java/build.xml
 --- sigar-1.6.5/bindings/java/build.xml	2011-04-21 20:38:36.000000000 +0200
-+++ sigar-1.6.5-gil/bindings/java/build.xml	2012-12-05 09:11:27.360092658 +0100
++++ sigar-1.6.5new/bindings/java/build.xml	2016-11-16 15:24:26.406041357 +0100
 @@ -22,7 +22,7 @@
    <property name="jni.info.res" location="build/src/sigar.res"/>
    <property name="jni.libprefix" value=""/> <!-- drop "java" prefix -->
@@ -10,16 +10,7 @@ diff -Nru sigar-1.6.5/bindings/java/build.xml sigar-1.6.5-gil/bindings/java/buil
  
    <condition property="file.version" value="-${sigar.version}">
      <isset property="file.versioned"/>
-@@ -50,13 +50,15 @@
-   <property name="sigar.fqdn" value=""/>
- 
-   <path id="libjars">
--     <fileset dir="lib" includes="*.jar"/>
-+     <fileset dir="/usr/share/java" includes="ant/cpptasks.jar"/>
-+     <fileset dir="/usr/share/java" includes="mx4j/mx4j-jmx.jar"/>
-+     <fileset dir="/usr/share/java" includes="log4j.jar"/>
-   </path>
- 
+@@ -56,7 +56,7 @@
    <path id="alljars">
       <path refid="libjars"/>
       <fileset dir="${sigar-bin}/lib" includes="${sigar.jar}"/>
@@ -28,16 +19,15 @@ diff -Nru sigar-1.6.5/bindings/java/build.xml sigar-1.6.5-gil/bindings/java/buil
    </path>
  
    <target name="javadoc_check">
-@@ -85,7 +87,7 @@
+@@ -85,7 +85,6 @@
               doctitle="Sigar">
        <group title="Sigar" packages="org.hyperic.sigar" />
        <classpath refid="libjars"/>
 -      <classpath><path path="${ant.library.dir}/ant.jar"/></classpath>
-+      <classpath><path path="/usr/share/java/ant.jar"/></classpath>
       <bottom>Copyright &#169; ${copyright.year} <![CDATA[<a target="_top" href="http://www.hyperic.com/">Hyperic</a>]]>. All Rights Reserved.</bottom>
      </javadoc>
    </target>
-@@ -96,7 +98,7 @@
+@@ -96,7 +95,7 @@
        <classpath refid="alljars"/>
      </available>
      <javac destdir="${build}/classes"
@@ -46,9 +36,9 @@ diff -Nru sigar-1.6.5/bindings/java/build.xml sigar-1.6.5-gil/bindings/java/buil
             sourcepath=""
             debug="true"
             classpathref="libjars">
-diff -Nru sigar-1.6.5/bindings/java/hyperic_jni/jni-build.xml sigar-1.6.5-gil/bindings/java/hyperic_jni/jni-build.xml
+diff -ur sigar-1.6.5/bindings/java/hyperic_jni/jni-build.xml sigar-1.6.5new/bindings/java/hyperic_jni/jni-build.xml
 --- sigar-1.6.5/bindings/java/hyperic_jni/jni-build.xml	2011-04-21 20:38:36.000000000 +0200
-+++ sigar-1.6.5-gil/bindings/java/hyperic_jni/jni-build.xml	2012-12-05 09:15:11.564529239 +0100
++++ sigar-1.6.5new/bindings/java/hyperic_jni/jni-build.xml	2016-11-16 14:13:40.190263635 +0100
 @@ -28,7 +28,7 @@
    <property name="jni.libprefix" value="java"/>
    <property name="jni.libversion" value=""/>

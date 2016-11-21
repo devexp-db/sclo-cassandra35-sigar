@@ -1,13 +1,16 @@
-Name:		sigar
+%{?scl:%scl_package sigar}
+%{!?scl:%global pkg_name %{name}}
+
+Name:		%{?scl_prefix}sigar
 Version:	1.6.5
-Release:	0.16.git58097d9%{?dist}
+Release:	0.17.git58097d9%{?dist}
 Summary:	System Information Gatherer And Reporter
 
 %global sigar_suffix  0-g4b67f57
 %global sigar_hash    58097d9
 
 # Use the same directory of the main package for subpackage licence and docs
-%global _docdir_fmt %{name}
+%global _docdir_fmt %{pkg_name}
 
 License:	ASL 2.0
 URL:		http://sigar.hyperic.com/
@@ -21,31 +24,32 @@ URL:		http://sigar.hyperic.com/
 #    git archive --prefix=sigar-1.6.5/ 833ca18 | bzip2 > sigar-1.6.5-833ca18.tbz2
 #
 # The diff from 1.6.4 is too huge to contemplate cherrypicking from
-Source0:	%{name}-%{version}-%{sigar_hash}.tbz2
+Source0:	%{pkg_name}-%{version}-%{sigar_hash}.tbz2
 
 # originally taken from http://repo1.maven.org/maven2/org/fusesource/sigar/1.6.4/sigar-1.6.4.pom
-Source1:	%{name}-template-pom.xml
+Source1:	%{pkg_name}-template-pom.xml
 
-BuildRequires:	gcc cmake
-
-BuildRequires:  cpptasks
-BuildRequires:  javapackages-local
-BuildRequires:  ant
-%if %{?fedora} > 20
-BuildRequires:  log4j12
+BuildRequires:	gcc
+BuildRequires:	cmake
+BuildRequires:	perl
+BuildRequires:	%{?scl_prefix}cpptasks
+BuildRequires:	%{?scl_prefix_maven}javapackages-local
+BuildRequires:	%{?scl_prefix_java_common}ant
+%if 0%{?fedora} > 20
+BuildRequires:	log4j12
 %else
-BuildRequires:  log4j
+BuildRequires:	%{?scl_prefix_java_common}log4j
 %endif
-BuildRequires:  mx4j
+%{?scl:Requires: %scl_runtime}
 
-Patch100: bz714249-1-cpu-count.patch
-Patch101: bz746288-1-cpu-count-arch.patch
+Patch100:	bz714249-1-cpu-count.patch
+Patch101:	bz746288-1-cpu-count-arch.patch
 # use system libraries
 # build only linux jni libraries
-Patch120: %{name}-%{version}-java_build.patch
+Patch120:	%{pkg_name}-%{version}-java_build.patch
 
 # AArch64 is 64-bit only so no -m64
-Patch130: aarch64-no-m64.patch
+Patch130:	aarch64-no-m64.patch
 
 %description
 The Sigar API provides a portable interface for gathering system
@@ -68,21 +72,21 @@ API to access this information regardless of the underlying platform.
 License:	ASL 2.0
 Group:		Development/Libraries
 Summary:	SIGAR Development package - System Information Gatherer And Reporter
-Requires:	%{name} = %{version}-%{release}
-BuildArch:      noarch
+Requires:	%{pkg_name} = %{version}-%{release}
+BuildArch:	noarch
 
 %description devel
 Header files for developing against the Sigar API
 
 %package java
-Summary:        SIGAR Java bindings
+Summary:	SIGAR Java bindings
 
 %description java
 This package contains the Java bindings SIGAR.
 
 %package javadoc
-Summary:        Javadoc for SIGAR Java bindings
-BuildArch:      noarch
+Summary:	Javadoc for SIGAR Java bindings
+BuildArch:	noarch
 
 %description javadoc
 This package contains javadoc for SIGAR Java bindings.
@@ -90,7 +94,7 @@ This package contains javadoc for SIGAR Java bindings.
 %prep
 # When using the GitHub tarballs, use:
 # setup -q -n hyperic-{name}-{sigar_hash}
-%setup -q -n %{name}-%{version}
+%setup -q -n %{pkg_name}-%{version}
 
 %patch100 -p1
 %patch101 -p1
@@ -102,9 +106,18 @@ find . -name "*.class" -delete
 find . -name "*.jar" -delete
 cp -p %{SOURCE1} bindings/java/pom.xml
 sed -i "s|@VERSION@|%{version}|" bindings/java/pom.xml
-%if %{?fedora} > 20
+%if 0%{?fedora} > 20
 sed -i.log4j12 "s|log4j.jar|log4j12-1.2.17.jar|" bindings/java/build.xml
 %endif
+
+%{?scl:scl enable %{scl_maven} %{scl} - << "EOF"}
+%if 0%{?fedora} > 20
+build-jar-repository bindings/java/lib log4j12-1.2.17
+%else
+build-jar-repository bindings/java/lib log4j
+%endif
+build-jar-repository bindings/java/lib ant/ant
+%{?scl:EOF}
 
 %build
 
@@ -122,23 +135,27 @@ make %{?_smp_mflags}
 popd
 
 pushd bindings/java
-%mvn_file org.fusesource:%{name} %{name}
+%{?scl:scl enable %{scl_maven} %{scl} - << "EOF"}
+%mvn_file org.fusesource:%{pkg_name} %{pkg_name}
 %ant build javadoc
-%mvn_artifact pom.xml %{name}-bin/lib/%{name}.jar
+%mvn_artifact pom.xml %{pkg_name}-bin/lib/%{pkg_name}.jar
+%{?scl:EOF}
 popd
 
 %install
 
 pushd build
 %cmake ..
-make install DESTDIR=$RPM_BUILD_ROOT
+make install DESTDIR=%{buildroot}
 popd
 
 pushd  bindings/java
+%{?scl:scl enable %{scl_maven} %{scl} - << "EOF"}
 %mvn_install -J build/javadoc
-mkdir -p %{buildroot}%{_libdir}/%{name}
-install -pm 755 %{name}-bin/lib/libsigar-*.so \
-  %{buildroot}%{_libdir}/%{name}/
+%{?scl:EOF}
+mkdir -p %{buildroot}%{_libdir}/%{pkg_name}
+install -pm 755 %{pkg_name}-bin/lib/libsigar-*.so \
+  %{buildroot}%{_libdir}/%{pkg_name}/
 popd
 
 %post -p /sbin/ldconfig
@@ -156,7 +173,7 @@ popd
 %doc NOTICE AUTHORS
 
 %files java -f bindings/java/.mfiles
-%{_libdir}/%{name}
+%{_libdir}/%{pkg_name}
 %license LICENSE
 %doc NOTICE
 
@@ -165,6 +182,9 @@ popd
 %doc NOTICE bindings/java/examples
 
 %changelog
+* Wed Nov 16 2016 Tomas Repik <trepik@redhat.com> - 1.6.5-0.17.git58097d9
+- scl conversion
+
 * Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.5-0.16.git58097d9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
