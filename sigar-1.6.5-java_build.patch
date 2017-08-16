@@ -6,7 +6,7 @@ diff -ur sigar-1.6.5/bindings/java/build.xml sigar-1.6.5new/bindings/java/build.
    <property name="jni.libprefix" value=""/> <!-- drop "java" prefix -->
    <property name="cpptasks.jar"
 -            location="hyperic_jni/lib/cpptasks.jar"/>
-+	    location="/usr/share/java/ant/cpptasks.jar"/>
++            location="hyperic_jni/lib/[ant][cpptasks].jar"/>
  
    <condition property="file.version" value="-${sigar.version}">
      <isset property="file.versioned"/>
@@ -44,7 +44,7 @@ diff -ur sigar-1.6.5/bindings/java/hyperic_jni/jni-build.xml sigar-1.6.5new/bind
    <property name="jni.libversion" value=""/>
  
 -  <property name="cpptasks.jar" location="lib/cpptasks.jar"/>
-+  <property name="cpptasks.jar" location="/usr/share/java/cpptasks.jar"/>
++  <property name="cpptasks.jar" location="lib/[ant][cpptasks].jar"/>
  
    <taskdef name="cc" classname="net.sf.antcontrib.cpptasks.CCTask">
      <classpath location="${cpptasks.jar}"/>

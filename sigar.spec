@@ -117,6 +117,7 @@ build-jar-repository bindings/java/lib log4j12-1.2.17
 build-jar-repository bindings/java/lib log4j
 %endif
 build-jar-repository bindings/java/lib ant/ant
+build-jar-repository bindings/java/hyperic_jni/lib/ ant/cpptasks
 %{?scl:EOF}
 
 %build
