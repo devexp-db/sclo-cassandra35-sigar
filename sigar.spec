@@ -3,7 +3,7 @@
 
 Name:		%{?scl_prefix}sigar
 Version:	1.6.5
-Release:	0.17.git58097d9%{?dist}
+Release:	0.19.git58097d9%{?dist}
 Summary:	System Information Gatherer And Reporter
 
 %global sigar_suffix  0-g4b67f57
@@ -72,7 +72,7 @@ API to access this information regardless of the underlying platform.
 License:	ASL 2.0
 Group:		Development/Libraries
 Summary:	SIGAR Development package - System Information Gatherer And Reporter
-Requires:	%{pkg_name} = %{version}-%{release}
+Requires:	%{?scl_prefix}%{pkg_name} = %{version}-%{release}
 BuildArch:	noarch
 
 %description devel
@@ -183,6 +183,12 @@ popd
 %doc NOTICE bindings/java/examples
 
 %changelog
+* Mon Aug 21 2017 Augusto Mecking Caringi <acaringi@redhat.com> - 1.6.5-0.19.git58097d9
+- rebuilt
+
+* Wed Aug 16 2017 Augusto Mecking Caringi <acaringi@redhat.com> - 1.6.5-0.18.git58097d9
+- rebuilt
+
 * Wed Nov 16 2016 Tomas Repik <trepik@redhat.com> - 1.6.5-0.17.git58097d9
 - scl conversion
 
